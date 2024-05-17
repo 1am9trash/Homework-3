@@ -74,6 +74,26 @@ class MyPortfolio:
         """
         TODO: Complete Task 4 Below
         """
+        threshold = [0.0005, 0.0003]
+
+        equal_weight = 1.0 / len(assets)
+        for i in range(0, self.lookback + 1):
+            self.portfolio_weights.iloc[i][assets] = equal_weight
+
+        for i in range(self.lookback + 1, len(self.returns)):
+            window_data = self.returns.iloc[i - self.lookback:i][assets]
+            mean_returns = window_data.mean()
+            today_day_data = self.returns.iloc[i - 1][assets]
+
+            selected_assets = mean_returns[(mean_returns > threshold[0]) & (today_day_data >= threshold[1])].index
+
+            self.portfolio_weights.iloc[i] = 0
+            if len(selected_assets) >= 0:
+                selected_window_data = window_data[selected_assets]
+                volatility = selected_window_data.std()
+                inverse_volatility = 1 / volatility
+                weights = inverse_volatility / inverse_volatility.sum()
+                self.portfolio_weights.iloc[i][selected_assets] = weights
 
         """
         TODO: Complete Task 4 Above
